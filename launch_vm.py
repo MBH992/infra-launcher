@@ -147,6 +147,7 @@ def delete_user_vm(session_id):
     VM_NAME = f"uservm-{session_id}"
     NIC_NAME = f"nic-{session_id}"
     DISK_NAME = f"{VM_NAME}-osdisk"
+    NSG_NAME = f"nsg-{session_id}"
 
     try:
         # Azure는 리소스를 동시에 삭제할 수 있으나, 순차적으로 진행하여 로그를 명확히 합니다.
@@ -159,6 +160,11 @@ def delete_user_vm(session_id):
         delete_nic_poller = network_client.network_interfaces.begin_delete(RESOURCE_GROUP, NIC_NAME)
         delete_nic_poller.wait()
         print(f"   - NIC {NIC_NAME} deleted.")
+
+        print(f"   - Deleting Network Security Group: {NSG_NAME}...")
+        delete_nsg_poller = network_client.network_security_groups.begin_delete(RESOURCE_GROUP, NSG_NAME)
+        delete_nsg_poller.wait()
+        print(f"   - NSG {NSG_NAME} deleted.")
 
         print(f"   - Deleting OS Disk: {DISK_NAME}...")
         delete_disk_poller = compute_client.disks.begin_delete(RESOURCE_GROUP, DISK_NAME)
